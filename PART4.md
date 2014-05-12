@@ -1,6 +1,6 @@
 # Part 4: Domain Names
 
-[<- Part 3](PART3.md) [Part 5 ->](PART5.md)
+[<- Part 3](PART3.md) | [Part 5 ->](PART5.md)
 
 This part covers:
 
@@ -46,3 +46,5 @@ server {
 ```
 
 The name `_` will never match any real domain, so this server block only gets engaged if none of the other domain names matched. 444 is a special nginx return code, which terminates the connection immediately. Now, if I navigate to `http://arch.lan`, the hostname I'm requesting (`arch.lan`) on the port I'm requesting (80) does not match any of my servers, so it gets routed to the default. The default server returns 444, which terminates the connection, so I get nothing (which is what I wanted).
+
+[<- Part 3](PART3.md) | [Part 5 ->](PART5.md)

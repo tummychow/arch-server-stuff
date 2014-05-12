@@ -1,6 +1,6 @@
 # Part 1: General Requirements
 
-[<- Readme](README.md) [Part 2 ->](PART2.md)
+[<- Readme](README.md) | [Part 2 ->](PART2.md)
 
 This part covers:
 
@@ -66,3 +66,5 @@ $ useradd -m -U peon
 ```
 
 When I install stuff that will be served, I am generally going log into peon, because I'm too lazy to `chown` things to peon after creating them. User permissions in Linux are a pretty big subject, so I'll leave it at that. You should familiarize yourself with the `chmod`, `chmod` `usermod` and `passwd` commands if you want to know more. The `sudo -u peon <command>` and `su - peon` commands might also be helpful (for invoking a command as peon, and becoming peon, respectively).
+
+[<- Readme](README.md) | [Part 2 ->](PART2.md)

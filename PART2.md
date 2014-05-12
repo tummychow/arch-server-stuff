@@ -1,6 +1,6 @@
 # Part 2: Gollum
 
-[<- Part 1](PART1.md) [Part 3 ->](PART3.md)
+[<- Part 1](PART1.md) | [Part 3 ->](PART3.md)
 
 This part covers:
 
@@ -115,3 +115,5 @@ server {
 ```
 
 However, I recommend, and have provided, a suitable `unicorn.rb` and a systemd unit file to go with it. You can `systemd start unicorn.gollum` with this setup. Again, remember that each application needs its own master process and its own socket. We configure some important files (notably the PID file and the socket location) in the config file, so each master process will also need its own config file. As far as configuration goes, Passenger is clearly easier. Remember to clean out the `gollum/tmp` directory if you switch back to the Passenger configuration (that's where my configuration of Unicorn puts all the logs and sockets, so it might be a bit cluttered).
+
+[<- Part 1](PART1.md) | [Part 3 ->](PART3.md)

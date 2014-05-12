@@ -1,6 +1,6 @@
 # Part 5: SSL
 
-[<- Part 4](PART4.md) Part 6 ->
+[<- Part 4](PART4.md) | Part 6 ->
 
 This part covers:
 
@@ -181,3 +181,5 @@ server {
 The default server must be using SSL on port 443, since the other servers are using SSL on port 443. Therefore, we also need an SSL key and certificate for the default server. I generated another keypair for that purpose. You could probably recycle one of your other certificates if you were lazy, but some clients will complain that the domain name of the certificate does not match the domain name of the target host.
 
 If you don't turn on SSL for the default server, but still attach it to port 443, then all your servers on port 443 will be borked. nginx will receive a request on port 443 and won't know whether it should use SSL or not, so it has to give up. This results in an error along the lines of "connection interrupted". In other words, if there's one server on port 443 using SSL, all the others on port 443 have to use SSL as well, even the default server.
+
+[<- Part 4](PART4.md) | Part 6 ->

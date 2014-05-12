@@ -1,6 +1,6 @@
 # Part 3: Phabricator
 
-[<- Part 2](PART2.md) [Part 4 ->](PART4.md)
+[<- Part 2](PART2.md) | [Part 4 ->](PART4.md)
 
 This part covers:
 
@@ -112,3 +112,5 @@ The most interesting configuration option is the mail backend. Phabricator can s
 ## Step 4: Phabricator SSH Repository Access
 
 Coming soon.
+
+[<- Part 2](PART2.md) | [Part 4 ->](PART4.md)
