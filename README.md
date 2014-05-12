@@ -1,6 +1,6 @@
 # README
 
-This Gist covers my experiment to set up an all-purpose applications server. Some interesting facts about my server:
+This guide covers my experiment to set up an all-purpose applications server. Some interesting facts about my server:
 
 - The server is founded on Arch Linux.
 - It uses nginx as its main HTTP server. I don't know anything about Apache, so don't ask me how to use that instead. I don't know a lot about nginx either, but hey, I made it work, so I'm not totally incompetent!
