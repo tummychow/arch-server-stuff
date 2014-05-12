@@ -1,0 +1,82 @@
+# this config is written for pretty low load
+# more tips:
+# https://github.com/h5bp/server-configs-nginx/blob/master/nginx.conf
+# https://github.com/Umkus/nginx-boilerplate/tree/master/src
+# https://calomel.org/nginx.html
+
+user peon;
+
+# obviously these are set quite low
+worker_processes 1;
+worker_rlimit_nofile 1024;
+events {
+  worker_connections 1000;
+}
+
+# arch linux systemd unit will specify the pid - do not add the directive yourself
+error_log /var/log/nginx/error.log warn;
+
+http {
+    include      mime.types;
+    default_type application/octet-stream;
+
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
+    access_log /var/log/nginx/access.log main;
+
+    sendfile on;
+    keepalive_timeout 120; # more generous than most configs would recommend
+    tcp_nopush on;
+    tcp_nodelay off;
+
+    gzip on;
+    gzip_http_version 1.0;
+    gzip_comp_level 5;
+    gzip_min_length 256;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_types
+        application/atom+xml
+        application/javascript
+        application/json
+        application/rss+xml
+        application/vnd.ms-fontobject
+        application/x-font-ttf
+        application/x-web-app-manifest+json
+        application/xhtml+xml
+        application/xml
+        font/opentype
+        image/svg+xml
+        image/x-icon
+        text/css
+        text/plain
+        text/x-component;
+
+    # https://wiki.mozilla.org/Security/Server_Side_TLS#Nginx
+    # i don't turn on stapling, since my certficates aren't issued from a trusted party
+    ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_dhparam /root/ssl/dhparam.pem;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:ECDHE-RSA-RC4-SHA:ECDHE-ECDSA-RC4-SHA:AES128:AES256:RC4-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK;
+
+    ssl_session_cache shared:SSL:1m; # smaller than most configs
+    ssl_session_timeout 10m;
+
+    passenger_root /usr/lib/passenger;
+    passenger_ruby /usr/bin/ruby;
+
+    server {
+        server_name _;
+
+        listen 80 default_server;
+        listen 443 ssl default_server;
+
+        ssl_certificate     /root/ssl/default.chain.crt;
+        ssl_certificate_key /root/ssl/default.pem;
+
+        return 444;
+    }
+
+    include sites/*;
+}

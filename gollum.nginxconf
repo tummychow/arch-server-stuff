@@ -1,0 +1,16 @@
+# http://www.modrails.com/documentation/Users%20guide%20Nginx.html#deploying_a_rack_app
+server {
+    server_name gollum.lan;
+    listen 443 ssl;
+    ssl_certificate /root/ssl/gollum.chain.crt;
+    ssl_certificate_key /root/ssl/gollum.pem;
+
+    root /home/peon/gollum/public;
+    passenger_enabled on;
+}
+
+server {
+    server_name gollum.lan;
+    listen 80;
+    return 301 https://gollum.lan$request_uri;
+}

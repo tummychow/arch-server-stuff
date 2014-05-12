@@ -1,0 +1,11 @@
+[Unit]
+Description=Daemons for Phabricator
+
+[Service]
+Type=oneshot
+User=peon
+
+ExecStart=/home/peon/phabroot/phabricator/bin/phd start
+RemainAfterExit=yes
+
+ExecStop=/home/peon/phabroot/phabricator/bin/phd stop

@@ -1,0 +1,12 @@
+[Unit]
+Description=Ruby Rack server for fast clients on Unix (serving Gollum)
+
+[Service]
+Type=forking
+User=peon
+WorkingDirectory=/home/peon/gollum
+PIDFile=/home/peon/gollum/tmp/gollum.pid
+
+ExecStart=/home/peon/.gem/ruby/2.1.0/bin/bundle exec unicorn -D -c /home/peon/gollum/unicorn.rb
+ExecReload=/usr/bin/kill -s 1 $MAINPID
+ExecStop=/usr/bin/kill -s 3 $MAINPID

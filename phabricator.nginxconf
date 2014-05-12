@@ -1,0 +1,32 @@
+# https://secure.phabricator.com/book/phabricator/article/configuration_guide/#webserver-configuring-ng
+server {
+    server_name phab.lan;
+    listen 443 ssl;
+    ssl_certificate /root/ssl/phab.chain.crt;
+    ssl_certificate_key /root/ssl/phab.pem;
+
+    root /home/peon/phabroot/phabricator/webroot;
+    try_files $uri $uri/ /index.php;
+
+    location / {
+        index index.php;
+        # i'm trying to replace this if with a try_files, not successful yet
+        # contributions welcome
+        if ( !-f $request_filename ) {
+            rewrite ^/(.*)$ /index.php?__path__=/$1 last;
+            break;
+        }
+    }
+
+    location /index.php {
+        fastcgi_pass unix:/run/php-fpm/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+    }
+}
+
+server {
+    server_name phab.lan;
+    listen 80;
+    return 301 https://phab.lan$request_uri;
+}

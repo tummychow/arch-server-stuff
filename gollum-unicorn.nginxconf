@@ -1,0 +1,27 @@
+# http://unicorn.bogomips.org/examples/nginx.conf
+upstream gollum_unicorn {
+  server unix:/home/peon/gollum/tmp/gollum.sock fail_timeout=0;
+}
+
+server {
+    server_name gollum.lan;
+    listen 443 ssl;
+    ssl_certificate /root/ssl/gollum.chain.crt;
+    ssl_certificate_key /root/ssl/gollum.pem;
+    root /home/peon/gollum/public;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+
+        proxy_pass http://gollum_unicorn;
+    }
+}
+
+server {
+    server_name gollum.lan;
+    listen 80;
+    return 301 https://gollum.lan$request_uri;
+}
