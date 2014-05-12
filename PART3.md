@@ -28,7 +28,7 @@ $ mysql_secure_installation
 $ systemctl stop mysqld
 ```
 
-You can read more about the configuration script [here](https://mariadb.com/kb/en/mysql_secure_installation/). Press <enter> first (the script wants the database's root password, but you just installed MariaDB, so there is no root password). The rest is up to you. I pressed <n> next (don't use a root password) and I pressed <y> for all the other questions. Obviously this is *not* a secure configuration, but that's not too important for me.
+You can read more about the configuration script [here](https://mariadb.com/kb/en/mysql_secure_installation/). Press enter first (the script wants the database's root password, but you just installed MariaDB, so there is no root password). The rest is up to you. I pressed N next (don't use a root password) and I pressed Y for all the other questions. Obviously this is *not* a secure configuration, but that's not too important for me.
 
 Next, you need to enable the PHP extensions you installed. PHP's configuration is `/etc/php/php.ini`. The extension lines are of the form `;extension=foobarbaz.so`. The semicolon indicates a comment. Make sure the following extensions are enabled (uncomment them if they're already present, add them to the list otherwise):
 
@@ -60,9 +60,8 @@ There's also some initial configuration you can do while you're here. Phabricato
 $ cd phabricator
 $ bin/config set mysql.user root # mysql root user
 $ bin/config set mysql.pass '' # mysql root password
-$ systemctl start mysqld
+# start mysqld if it's not running
 $ bin/storage upgrade --user root
-$ systemctl stop mysqld
 ```
 
 Now, you need to add nginx configuration for phabricator. Here is the server block:
@@ -78,7 +77,7 @@ server {
     location / {
         index index.php;
         if ( !-f $request_filename ) {
-            rewrite ^ /index.php?__path__=$request_uri last;
+            rewrite ^/(.*)$ /index.php?__path__=/$1 last;
             break;
         }
     }
@@ -93,7 +92,7 @@ server {
 
 Note that the port is set to 81. If you already set up Gollum, then it's using 127.0.0.1:80. You can't have both servers listening on the same hostname and the same port. nginx wouldn't know which one to serve. So the ports have to be different. Once that's done, you need to start mysqld, php-fpm and nginx: `systemctl start mysqld php-fpm nginx`.
 
-Now, you can navigate to `localhost.localdomain:81` to get started. Note that Phabricator needs to run on a fully qualified domain name (FQDN), with a DNS suffix (that's the `.com` at the end of `github.com`). That's why you need to use `localhost.localdomain` and not just `localhost` or 127.0.0.1. [Part 5](PART5.md) discusses how to set up an FQDN using your router.
+Now, you can navigate to `localhost.localdomain:81` to get started. Note that Phabricator needs to run on a fully qualified domain name (FQDN), with a DNS suffix (that's the `.com` at the end of `github.com`). That's why you need to use `localhost.localdomain` and not just `localhost` or 127.0.0.1. [Part 4](PART4.md) discusses how to set up an FQDN using your router.
 
 ## Step 3: Phabricator Configuration Details
 
@@ -101,7 +100,11 @@ It's a credit to the Phabricator team that their software explains itself so wel
 
 For the Phabricator daemons, they are managed through the `phd` script in `phabricator/bin`. I wrapped the script in a very simple [systemd unit](phd.service), which is included with this repository. Add this unit to `/etc/systemd/system/`, and then you can control the daemons from systemd with `systemctl start phd` and `systemctl stop phd`.
 
-When you configure the Phabricator repository root, remember that this directory needs to be accessible by the Phabricator daemons. The systemd unit runs the daemons as peon, so the repository root also needs to be accessible to the user peon. I used a local directory, and set it to `bin/config set repository.default-local-path "/home/peon/phabroot/repo"`.
+When you configure the Phabricator repository root, remember that this directory needs to be accessible by the Phabricator daemons. The systemd unit runs the daemons as peon, so the repository root also needs to be accessible to the user peon. I used a local directory, and set it like so:
+
+```bash
+$ bin/config set repository.default-local-path "/home/peon/phabroot/repo"
+```
 
 The base-uri should be set to the FQDN you want to run Phabricator on, plus the `http://` at the start. You can also leave it unset and serve Phabricator at any domain that maps to it.
 
