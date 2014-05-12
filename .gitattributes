@@ -1,0 +1,8 @@
+*.md text
+
+*.nginxconf text
+*.service text
+
+Gemfile text
+*.ru text
+*.rb text
