@@ -112,8 +112,53 @@ Some of the configurations will require root. To turn on strict mode for MariaDB
 
 The most interesting configuration option is the mail backend. Phabricator can send mail to users for notifications, but it needs a service to provide the delivery. Phabricator supports several paid services (Amazon SES, Mailgun) which make this process easy, but they cost money. The default mail adapter invokes the `sendmail` binary. This is a *de facto* standard from the days of the first popular mail transfer agent, sendmail. Nowadays, the most popular MTA is probably postfix. Arch has official packages for postfix and exim, both of which provide the `sendmail` binary. I'll go into more details on those in another section.
 
-## Step 4: Phabricator SSH Repository Access
+## Step 4: Phabricator Repo Hosting
 
-Coming soon.
+Phabricator has a great guide [here](https://secure.phabricator.com/book/phabricator/article/diffusion_hosting/) which will be useful throughout this part. It mentions having multiple different users for the daemons, the webserver, and the repository user, but for convenience, all three users will be the same: peon. The daemons are already run by peon, and the nginx workers are already running under peon, so the next step is setting up peon to be the repository user.
+
+Phabricator needs the other users to be able to sudo as the repository user. This is true *even* if all three users are the same. (Yes, peon needs to be able to sudo as peon.) I didn't have peon configured for *any* sudo permissions, at all, so I had to add the permissions that Phabricator wanted. Crack open `visudo` with your preferred editor (eg `EDITOR=nano visudo`) and add this line at the bottom:
+
+```
+peon ALL=(peon) SETENV: NOPASSWD: /path/to/bin/git-upload-pack, /path/to/bin/git-receive-pack, /path/to/bin/hg, /path/to/bin/svnserve
+```
+
+Then, run the following configuration commands. In my case, peon has no password, so I didn't need to run any password modification commands. (I found that doing things like `passwd -l peon` or `usermod -e 1970-01-01 peon` broke my configuration. Phabricator recommends doing things like editing `/etc/shadow` but I'd *really* rather do that using standard passwd commands. Your mileage may vary.)
+
+```bash
+$ bin/config set phd.user peon
+$ bin/config set diffusion.ssh-user peon
+```
+
+Next, you need to move sshd to another port. Phabricator will run another instance of sshd on port 22, which will be restricted for repository access only, so your real sshd instance needs to go somewhere else. In `/etc/ssh/sshd_config`, change the `Port` to another one that you'll remember. The documentation is very careful about this step, because if your only access is over ssh, you could lock yourself out of the server. I'm pretty careless about this since I can either drop into the virtual console directly (VM) or access the system's hardware serial console (ARM computers). Many of the big VPS hosters have a web interface to access your machine's virtual console. That might also be useful. Once you've updated the sshd configs, `systemctl restart sshd`. Your shell should persist, so exit, and try sshing into the new port: `ssh root@yourhost -p yourport`. If you did things right, that should actually work. Now you can continue. (If you're using scp to copy into the server, the flag for the port is `-P`. That's a capital P.)
+
+There are two Phabricator sshd configuration files in `/home/peon/phabroot/phabricator/resources/sshd` (or similar for you). I copied the custom sshd config to `/etc/ssh/phab_sshd_config`, and I copied the script to `/etc/ssh/phabricator-ssh-hook.sh`. Make sure to edit both files. You need to set the name of the VCS user (in my case, peon), the authorized command (the location of the Phabricator ssh script), and the location of Phabricator itself (ie `/home/peon/phabroot/phabricator`). I also changed the sshd config's `PidFile` to `/run/sshd-phabricator.pid`. Assuming your config is in the same places as mine, you can use my systemd unit, [sshd-phab](sshd-phab.service), to launch the custom sshd.
+
+Launch all your daemons - mysqld, php-fpm, phd, nginx and the new sshd (in my case, sshd-phab). Log into your Phabricator instance and navigate to Settings->SSH Public Keys->Upload. Add a public key for the system you're currently on (ie the one you're using to ssh into the server). Now, go back to that system, and try the following commands:
+
+```bash
+$ echo {} | ssh peon@phab.lan conduit conduit.ping
+{"result":"SEKHMET","error_code":null,"error_info":null}
+# note: SEKHMET is the actual hostname of my server, in /etc/hostname
+# yours will probably be different
+
+$ ssh peon@phab.lan
+PTY allocation request failed on channel 0
+phabricator-ssh-exec: Welcome to Phabricator.
+
+You are logged in as sjung.
+
+You haven't specified a command to run. This means you're requesting an interactive shell, but Phabricator does not provide an interactive shell over SSH.
+
+Usually, you should run a command like `git clone` or `hg push` rather than connecting directly with SSH.
+
+Supported commands are: conduit, git-receive-pack, git-upload-pack, hg, svnserve.
+Connection to phab.lan closed.
+```
+
+As you can see, your login is denied (which is good, because people should not be able to login as the VCS user), and you get some nice pretty Phabricator messages to indicate that your public key is where it's supposed to be. If this part isn't working, then you didn't configure your sshd correctly, or your VCS user's login permissions are messed up.
+
+Once this is all done, I recommend trying to add a new repo to your Phabricator instance. You'll need to go into the advanced options and ensure that ssh access to the repo is enabled. Then activate the repo. If you head to the repo's root (eg `http://phab.lan/diffusion/S/` if the callsign is S), you should see an ssh clone URL. This indicates that Phabricator has been configured to provide this repo over ssh.
+
+Add the ssh remote URL to an existing Git repository you have, and try pushing to it. If everything goes off without a hitch, you should be able to see the repository contents on your Phabricator instance. If that *didn't* work, then your sudoers configuration is probably the issue - it indicates that you can ssh in under peon, but peon does not have the authority to run the commands required.
 
 [<- Part 2](PART2.md) | [Part 4 ->](PART4.md)

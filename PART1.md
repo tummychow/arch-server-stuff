@@ -12,7 +12,7 @@ This part covers:
 
 First up: if you don't know what ssh is, [go here](https://wiki.archlinux.org/index.php/Secure%20Shell). My server is headless, as most production servers are, so I like to edit configs and stuff from my main system, which is more comfortable. You need ssh for that. ssh is also important for manipulating Git repositories hosted by Phabricator, so if you plan on using Phabricator, this step is especially important.
 
-Your fresh Arch system will not have ssh out of the box, so you need to install it first. I have no familiarity with alternative SSH servers like dropbear, so if you use those you're on your own.
+Your fresh Arch system will not have ssh out of the box, so you need to install it first. I have no familiarity with alternative SSH servers like dropbear, so if you use those you're on your own. (Moreover, Phabricator depends on configuration options in OpenSSH's sshd.)
 
 ```bash
 $ pacman -S openssh
