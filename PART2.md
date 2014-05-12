@@ -59,7 +59,7 @@ http {
 }
 ```
 
-Now, nginx needs to know which applications will be using Passenger. You do this by adding a `passenger_enabled on;` directive to the server block. Passenger expects that the root directory of the server will be that empty `public` directory we made earlier. So the server configuration should look vaguely like this:
+Now, nginx needs to know which applications will be using Passenger. You do this by adding a `passenger_enabled on;` directive to the server block. Passenger expects that the root directory of the server will be that empty `public` directory you made earlier. So the server configuration should look vaguely like this:
 
 ```nginx
 server {
@@ -72,7 +72,7 @@ server {
 
 And that's all! If you start nginx, gollum should come up at the port and path you specified. The Gollum wiki will store its repository is at `/home/peon/gollum/repo`, as I mentioned earlier. You can edit those files with any text editor and the changes will appear in Gollum's hosted content.
 
-You should be aware that this configuration is probably suboptimal. Gollum contains, inside the gem, its public assets (CSS, JS and so on). Ideally, we'd rather serve these assets through nginx without indirecting through Passenger and Gollum itself. That makes installation more complicated (because you have to install your repository and config files inside Gollum's own gem directory), and it's not a big deal for me, so I don't care to figure out a fix.
+You should be aware that this configuration is probably suboptimal. Gollum contains, inside the gem, its public assets (CSS, JS and so on). Ideally, nginx would serve those assets on its own, without indirecting through Passenger and Gollum itself. That makes installation more complicated (because you have to install your repository and config files inside Gollum's own gem directory), and it's not a big deal for me, so I don't care to figure out a fix.
 
 ## Step 3: Configuring Unicorn
 
@@ -88,10 +88,10 @@ To launch the Unicorn master, you simply `unicorn` from the directory containing
 
 ```bash
 $ cd /home/peon/gollum
-$ bundle exec unicorn -D -l /run/unicorn/gollum.sock
+$ bundle exec unicorn -D -l /home/peon/gollum/tmp/gollum.sock
 ```
 
-This is technically enough to launch Unicorn's workers, listening on the socket `unix:/run/unicorn/gollum.sock`. Important note: each Unicorn master can only serve one application, where as Passenger can serve many applications (and, under some circumstances, share memory between them, eg if they all use the same version of Rails). Then configure an nginx reverse proxy to the workers like so:
+This is technically enough to launch Unicorn's workers, listening on the socket `unix:/home/peon/gollum/tmp/gollum.sock` (Unicorn needs to be able to read and write the socket, so I chose a location that peon can access). Important note: each Unicorn master can only serve one application, where as Passenger can serve many applications (and, under some circumstances, share memory between them, eg if they all use the same version of Rails). Then configure an nginx reverse proxy to the workers like so:
 
 ```nginx
 upstream gollum_unicorn {
