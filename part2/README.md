@@ -59,7 +59,7 @@ http {
 }
 ```
 
-Now, nginx needs to know which applications will be using Passenger. You do this by adding a `passenger_enabled on;` directive to the server block. Passenger expects that the root directory of the server will be that empty `public` directory you made earlier. So the server configuration should look vaguely like this:
+Now, nginx needs to know which applications will be using Passenger. You do this by adding a `passenger_enabled on;` directive to the server block. Passenger expects that the root directory of the server will be that empty `public` directory you made earlier. So the server configuration should look vaguely like [this](gollum.nginxconf):
 
 ```nginx
 server {
@@ -114,6 +114,6 @@ server {
 }
 ```
 
-However, I recommend, and have provided, a suitable `unicorn.rb` and a systemd unit file to go with it. You can `systemd start unicorn.gollum` with this setup. Again, remember that each application needs its own master process and its own socket. We configure some important files (notably the PID file and the socket location) in the config file, so each master process will also need its own config file. As far as configuration goes, Passenger is clearly easier. Remember to clean out the `gollum/tmp` directory if you switch back to the Passenger configuration (that's where my configuration of Unicorn puts all the logs and sockets, so it might be a bit cluttered).
+However, I recommend, and have provided, a suitable [`unicorn.rb`](unicorn.rb) and a [systemd unit file](unicorn.gollum.service) to go with it. The [nginx configuration](gollum-unicorn.nginxconf) for Unicorn might also be useful. You can `systemd start unicorn.gollum` with this setup. Again, remember that each application needs its own master process and its own socket. We configure some important files (notably the PID file and the socket location) in the config file, so each master process will also need its own config file. As far as configuration goes, Passenger is clearly easier. Remember to clean out the `gollum/tmp` directory if you switch back to the Passenger configuration (that's where my configuration of Unicorn puts all the logs and sockets, so it might be a bit cluttered).
 
 [<- Part 1](../part1) | [Part 3 ->](../part3)

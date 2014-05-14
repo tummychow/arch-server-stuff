@@ -65,7 +65,7 @@ $ rm signer.csr # no longer needed
 
 ## Step 2: Child Certificates
 
-Now you need to generate keys and certificate requests for each application server. nginx uses the server's key to encrypt communication with the client. You can't place a password on this key, because nginx's master process needs to read the key into memory before using it. If the key was encrypted, nginx would have to ask you for the password each time it started up, in order to decrypt the key. Also remember that the signing request needs to have the Common Name set to the domain it covers. I'm hosting Gollum on `gollum.lan` and Phabricator on `phab.lan` (see [part 4](PART4.md)), so those are the names I'm using. The other metadata is not important for this situation.
+Now you need to generate keys and certificate requests for each application server. nginx uses the server's key to encrypt communication with the client. You can't place a password on this key, because nginx's master process needs to read the key into memory before using it. If the key was encrypted, nginx would have to ask you for the password each time it started up, in order to decrypt the key. Also remember that the signing request needs to have the Common Name set to the domain it covers. I'm hosting Gollum on `gollum.lan` and Phabricator on `phab.lan` (see [part 4](../part4)), so those are the names I'm using. The other metadata is not important for this situation.
 
 ```bash
 $ openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out phab.pem
@@ -108,7 +108,7 @@ This gives you a keypair, `phab.pem`, and a certificate for that keypair, `phab.
 
 ## Step 3: Hosting Certificates
 
-The last step is to tell nginx how to serve the certificates to a client. You first need to configure nginx for SSL. My [nginx.conf](nginx.nginxconf) has some reasonable settings for those that don't really care about security. The OpenSSL cipher list I'm using comes from [Mozilla](https://wiki.mozilla.org/Security/Server_Side_TLS#Nginx), and it favors ciphers with perfect forward secrecy. I'm not a cryptographer, so I won't try to explain what that means, but to use those ciphers, you need a parameter:
+The last step is to tell nginx how to serve the certificates to a client. You first need to configure nginx for SSL. My [nginx.conf](../part1/nginx.nginxconf) has some reasonable settings for those that don't really care about security. The OpenSSL cipher list I'm using comes from [Mozilla](https://wiki.mozilla.org/Security/Server_Side_TLS#Nginx), and it favors ciphers with perfect forward secrecy. I'm not a cryptographer, so I won't try to explain what that means, but to use those ciphers, you need a parameter:
 
 ```bash
 # this takes 20-60 seconds on my system, ymmv

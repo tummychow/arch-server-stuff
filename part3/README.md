@@ -64,7 +64,7 @@ $ bin/config set mysql.pass '' # mysql root password
 $ bin/storage upgrade --user root
 ```
 
-Now, you need to add nginx configuration for phabricator. Here is the server block:
+Now, you need to add nginx configuration for phabricator. [Here](phabricator.nginxconf) is the server block:
 
 ```nginx
 server {
@@ -92,7 +92,7 @@ server {
 
 Note that the port is set to 81. If you already set up Gollum, then it's using 127.0.0.1:80. You can't have both servers listening on the same hostname and the same port. nginx wouldn't know which one to serve. So the ports have to be different. Once that's done, you need to start mysqld, php-fpm and nginx: `systemctl start mysqld php-fpm nginx`.
 
-Now, you can navigate to `localhost.localdomain:81` to get started. Note that Phabricator needs to run on a fully qualified domain name (FQDN), with a DNS suffix (that's the `.com` at the end of `github.com`). That's why you need to use `localhost.localdomain` and not just `localhost` or 127.0.0.1. [Part 4](PART4.md) discusses how to set up an FQDN using your router.
+Now, you can navigate to `localhost.localdomain:81` to get started. Note that Phabricator needs to run on a fully qualified domain name (FQDN), with a DNS suffix (that's the `.com` at the end of `github.com`). That's why you need to use `localhost.localdomain` and not just `localhost` or 127.0.0.1. [Part 4](../part4) discusses how to set up an FQDN using your router.
 
 ## Step 3: Phabricator Configuration Details
 
