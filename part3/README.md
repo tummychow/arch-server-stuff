@@ -1,6 +1,6 @@
 # Part 3: Phabricator
 
-[<- Part 2](PART2.md) | [Part 4 ->](PART4.md)
+[<- Part 2](../part2) | [Part 4 ->](../part4)
 
 This part covers:
 
@@ -161,4 +161,4 @@ Once this is all done, I recommend trying to add a new repo to your Phabricator 
 
 Add the ssh remote URL to an existing Git repository you have, and try pushing to it. If everything goes off without a hitch, you should be able to see the repository contents on your Phabricator instance. If that *didn't* work, then your sudoers configuration is probably the issue - it indicates that you can ssh in under peon, but peon does not have the authority to run the commands required.
 
-[<- Part 2](PART2.md) | [Part 4 ->](PART4.md)
+[<- Part 2](../part2) | [Part 4 ->](../part4)

@@ -25,11 +25,11 @@ Because I use my own computer for the server and host it behind a NAT, security 
 
 This guide started to get pretty big after a while, and huge Markdown files are hard to work with (too much scrolling), so I broke it into pieces.
 
-- [Part 1](PART1.md) - basic requirements. Set up nginx and ssh, get the show on the road.
-- [Part 2](PART2.md) - Gollum. Passenger makes this part easy. I've got a Unicorn configuration as well, which seems to work okay.
-- [Part 3](PART3.md) - Phabricator. Phabricator also has lots of configuration, some of which I will cover, and some of which is a work in progress.
-- [Part 4](PART4.md) - Domain names. Use DNSMasq on your router for nice local DNS names. Also has a brief note on nginx default servers.
-- [Part 5](PART5.md) - SSL. Establish your own certificate authority and use it to assign SSL certificates to your application servers.
+- [Part 1](part1) - basic requirements. Set up nginx and ssh, get the show on the road.
+- [Part 2](part2) - Gollum. Passenger makes this part easy. I've got a Unicorn configuration as well, which seems to work okay.
+- [Part 3](part3) - Phabricator. Phabricator also has lots of configuration, some of which I will cover, and some of which is a work in progress.
+- [Part 4](part4) - Domain names. Use DNSMasq on your router for nice local DNS names. Also has a brief note on nginx default servers.
+- [Part 5](part5) - SSL. Establish your own certificate authority and use it to assign SSL certificates to your application servers.
 
 Why are the parts ordered the way they are? Mainly because that's the order that I did things. I've tried to make the parts independent, so if you want to set up Phabricator but not Gollum, you don't *have* to read Part 2.
 
